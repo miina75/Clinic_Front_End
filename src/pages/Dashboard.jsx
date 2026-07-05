@@ -24,7 +24,6 @@ export default function Dashboard() {
   async function fetchAll() {
     try {
       setLoading(true)
-
       const [pRes, dRes, vRes, bRes] = await Promise.allSettled([
         axios.get(`${API}/Patient`),
         axios.get(`${API}/Doctor`),
@@ -74,20 +73,20 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-800 mb-6">Dashboard</h2>
+      <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">Dashboard</h2>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {cards.map(({ label, value, icon: Icon, color, link, linkLabel }) => (
-          <div key={label} className="bg-white rounded-xl p-5 shadow-sm flex items-center gap-4">
+          <div key={label} className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm flex items-center gap-4">
             <div className={`${color} flex h-12 w-12 shrink-0 items-center justify-center rounded-xl`}>
               <Icon size={22} color="white" stroke={1.8} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-800">
+              <p className="text-2xl font-bold text-gray-800 dark:text-white">
                 {loading ? '...' : value}
               </p>
-              <p className="text-xs text-gray-400">{label}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">{label}</p>
               <button
                 onClick={() => navigate(link)}
                 className="text-xs text-blue-500 hover:underline"
@@ -100,9 +99,9 @@ export default function Dashboard() {
       </div>
 
       {/* Recent Visits */}
-      <div className="bg-white rounded-xl shadow-sm p-5">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-gray-700">Recent Visits</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200">Recent Visits</h3>
           <button
             onClick={() => navigate('/visits')}
             className="text-xs text-blue-500 hover:underline"
@@ -118,7 +117,7 @@ export default function Dashboard() {
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100 text-left text-xs text-gray-400 uppercase">
+              <tr className="border-b border-gray-100 dark:border-gray-700 text-left text-xs text-gray-400 uppercase">
                 <th className="pb-3 font-medium">#</th>
                 <th className="pb-3 font-medium">Patient</th>
                 <th className="pb-3 font-medium">Doctor</th>
@@ -129,20 +128,20 @@ export default function Dashboard() {
             </thead>
             <tbody>
               {recentVisits.map((visit, i) => (
-                <tr key={visit.visitId} className="border-b border-gray-50 last:border-0">
+                <tr key={visit.visitId} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                   <td className="py-3 text-gray-400">{i + 1}</td>
-                  <td className="py-3 text-gray-700 font-medium">
+                  <td className="py-3 text-gray-700 dark:text-gray-200 font-medium">
                     {patients[visit.patientId] ?? `Patient #${visit.patientId}`}
                   </td>
-                  <td className="py-3 text-gray-600">
+                  <td className="py-3 text-gray-600 dark:text-gray-300">
                     {doctors[visit.doctorId] ?? `Doctor #${visit.doctorId}`}
                   </td>
-                  <td className="py-3 text-gray-500">
+                  <td className="py-3 text-gray-500 dark:text-gray-400">
                     {visit.visitDate?.split('T')[0]}
                   </td>
-                  <td className="py-3 text-gray-600">{visit.diagnosis}</td>
+                  <td className="py-3 text-gray-600 dark:text-gray-300">{visit.diagnosis}</td>
                   <td className="py-3">
-                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+                    <span className="rounded-full bg-green-100 dark:bg-green-900/40 px-3 py-1 text-xs font-medium text-green-700 dark:text-green-400">
                       Completed
                     </span>
                   </td>
