@@ -118,7 +118,7 @@ export default function Dashboard() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 dark:border-gray-700 text-left text-xs text-gray-400 uppercase">
-                <th className="pb-3 font-medium">Visit Id</th>
+                <th className="pb-3 font-medium">VisitId</th>
                 <th className="pb-3 font-medium">Patient</th>
                 <th className="pb-3 font-medium">Doctor</th>
                 <th className="pb-3 font-medium">Date</th>
