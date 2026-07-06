@@ -1,19 +1,15 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { Button, Card, LoadingMessage, Table } from '../components/ui'
 import { IconPlus, IconEdit, IconTrash } from '@tabler/icons-react'
+import { SearchBar } from '../components/ui'
 
 const API = import.meta.env.VITE_CLINIC_API
 
-const roleColors = {
-  Admin: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400',
-  Receptionist: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
-  Doctor: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
-  Patient: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
-}
-
 export default function Users() {
   const [users, setUsers] = useState([])
+  const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const navigate = useNavigate()
@@ -44,74 +40,73 @@ export default function Users() {
     }
   }
 
+  const columns = [
+    { key: 'userId', label: 'User ID' },
+    { key: 'username', label: 'Username' },
+    { key: 'email', label: 'Email' },
+    { key: 'role', label: 'Role' },
+    { key: 'actions', label: 'Action' },
+  ]
+
+  const filteredUsers = users.filter((user) => {
+    const term = search.toLowerCase()
+    return `${user.username} ${user.email}`.toLowerCase().includes(term)
+  })
+
+  const renderRow = (user) => (
+    <tr key={user.userId} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+      <td className="py-3 text-gray-400 dark:text-gray-500">{user.userId}</td>
+      <td className="py-3 text-gray-700 dark:text-gray-200 font-medium">{user.username}</td>
+      <td className="py-3 text-gray-600 dark:text-gray-300">{user.email}</td>
+      <td className="py-3">
+        <span className={`rounded-full px-3 py-1 text-xs font-medium ${user.role === 'Admin' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400' : user.role === 'Receptionist' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400' : user.role === 'Doctor' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'}`}>
+          {user.role}
+        </span>
+      </td>
+      <td className="py-3">
+        <div className="flex items-center gap-2">
+          <Button type="button" variant="secondary" size="sm" className="px-2 py-2" onClick={() => navigate(`/users/edit/${user.userId}`)}>
+            <IconEdit size={14} />
+          </Button>
+          <Button type="button" variant="ghost" size="sm" className="px-2 py-2 text-red-600 hover:bg-red-50" onClick={() => handleDelete(user.userId, user.username)}>
+            <IconTrash size={14} />
+          </Button>
+        </div>
+      </td>
+    </tr>
+  )
+
   return (
     <div>
       <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">Users</h2>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={() => navigate('/users/add')}
-            className="flex items-center gap-2 bg-blue-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-          >
+      <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4">
+          <SearchBar
+            value={search}
+            onChange={setSearch}
+            placeholder="Search by name or email"
+            className="md:max-w-sm"
+          />
+          <Button type="button" className="flex items-center gap-2" onClick={() => navigate('/users/add')}>
             <IconPlus size={16} /> Add User
-          </button>
+          </Button>
         </div>
 
         {loading ? (
-          <div className="py-12 text-center text-sm text-gray-400">Loading users...</div>
+          <LoadingMessage message="Loading users..." />
         ) : error ? (
           <div className="py-12 text-center text-sm text-red-400">{error}</div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 dark:border-gray-700 text-left text-xs text-gray-400 uppercase">
-                <th className="pb-3 font-medium">User Id</th>
-                <th className="pb-3 font-medium">Username</th>
-                <th className="pb-3 font-medium">Email</th>
-                <th className="pb-3 font-medium">Role</th>
-                <th className="pb-3 font-medium">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.userId} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <td className="py-3 text-gray-400 dark:text-gray-500">{user.userId}</td>
-                  <td className="py-3 text-gray-700 dark:text-gray-200 font-medium">{user.username}</td>
-                  <td className="py-3 text-gray-600 dark:text-gray-300">{user.email}</td>
-                  <td className="py-3">
-                    <span className={`rounded-full px-3 py-1 text-xs font-medium ${roleColors[user.role] ?? 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'}`}>
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="py-3">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => navigate(`/users/edit/${user.userId}`)}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
-                      >
-                        <IconEdit size={14} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(user.userId, user.username)}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50 dark:bg-red-900/30 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
-                      >
-                        <IconTrash size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table columns={columns} data={filteredUsers} renderRow={renderRow} className="min-w-full" />
         )}
 
         {!loading && !error && (
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
-            Showing 1 to {users.length} of {users.length} entries
+            Showing 1 to {filteredUsers.length} of {filteredUsers.length} entries
           </p>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import {
   IconLayoutDashboard,
@@ -13,6 +13,7 @@ import {
   IconShieldPlus,
   IconSun,
   IconMoon,
+  IconX,
 } from '@tabler/icons-react'
 
 const navItems = [
@@ -25,7 +26,7 @@ const navItems = [
   { label: 'Users', icon: IconUser, to: '/users' },
 ]
 
-export default function Sidebar({ onLogout }) {
+export default function Sidebar({ onLogout, mobileOpen, onMobileClose }) {
   const [collapsed, setCollapsed] = useState(false)
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem('darkMode') === 'true'
@@ -42,7 +43,7 @@ export default function Sidebar({ onLogout }) {
   }, [darkMode])
 
   return (
-    <aside className={`flex flex-col bg-[#1a2942] transition-all duration-300 ${collapsed ? 'w-16' : 'w-56'}`}>
+    <aside className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-[#1a2942] transition-transform duration-300 lg:static lg:w-auto lg:translate-x-0 ${collapsed ? 'lg:w-16' : 'lg:w-56'} ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
 
       {/* Logo */}
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-5">
@@ -52,12 +53,20 @@ export default function Sidebar({ onLogout }) {
           </div>
           {!collapsed && <span className="text-sm font-semibold text-white">Clinic CMS</span>}
         </div>
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="text-gray-400 hover:text-white transition-colors"
-        >
-          <IconMenu2 size={18} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="hidden text-gray-400 transition-colors hover:text-white lg:inline-flex"
+          >
+            <IconMenu2 size={18} />
+          </button>
+          <button
+            onClick={onMobileClose}
+            className="text-gray-400 transition-colors hover:text-white lg:hidden"
+          >
+            <IconX size={18} />
+          </button>
+        </div>
       </div>
 
       {/* Nav Items */}

@@ -1,12 +1,9 @@
-
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
+import { Button, Card, FormField, Input, Select, FormActions, LoadingMessage } from '../components/ui'
 
 const API = import.meta.env.VITE_CLINIC_API
-const PATIENTS_API = import.meta.env.VITE_PATIENTS_API
-const DOCTORS_API = import.meta.env.VITE_DOCTORS_API
-
 const empty = { patientId: '', doctorId: '', visitDate: '', diagnosis: '' }
 
 export default function AddEditVisits() {
@@ -24,7 +21,7 @@ export default function AddEditVisits() {
   useEffect(() => {
     fetchDropdowns()
     if (isEdit) fetchVisit()
-  }, [id])
+  }, [id, isEdit])
 
   async function fetchDropdowns() {
     try {
@@ -92,79 +89,52 @@ export default function AddEditVisits() {
     }
   }
 
-  if (fetching) return <div className="py-20 text-center text-sm text-gray-400">Loading visit...</div>
+  if (fetching) return <LoadingMessage message="Loading visit..." />
   if (error) return <div className="py-20 text-center text-sm text-red-400">{error}</div>
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs text-gray-400 mb-1">Visits &gt; {isEdit ? 'Edit Visit' : 'New Visit'}</p>
           <h2 className="text-xl font-bold text-gray-800">{isEdit ? 'Edit Visit' : 'New Visit'}</h2>
         </div>
         {isEdit && (
-          <button
-            onClick={handleDelete}
-            className="bg-red-50 text-red-500 text-sm px-4 py-2 rounded-lg hover:bg-red-100 transition-colors"
-          >
+          <Button variant="danger" size="sm" onClick={handleDelete}>
             Delete Visit
-          </button>
+          </Button>
         )}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-6 max-w-lg">
-        <form onSubmit={handleSave} className="grid grid-cols-2 gap-4">
-
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Patient</label>
-            <select
-              name="patientId"
-              value={form.patientId}
-              onChange={handleChange}
-              required
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            >
+      <Card className="w-full max-w-2xl">
+        <form onSubmit={handleSave} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormField label="Patient">
+            <Select name="patientId" value={form.patientId} onChange={handleChange} required>
               <option value="">Select patient</option>
               {patients.map(p => (
                 <option key={p.patientId} value={p.patientId}>
                   {p.firstName} {p.lastName}
                 </option>
               ))}
-            </select>
-          </div>
+            </Select>
+          </FormField>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Doctor</label>
-            <select
-              name="doctorId"
-              value={form.doctorId}
-              onChange={handleChange}
-              required
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            >
+          <FormField label="Doctor">
+            <Select name="doctorId" value={form.doctorId} onChange={handleChange} required>
               <option value="">Select doctor</option>
               {doctors.map(d => (
                 <option key={d.doctorId} value={d.doctorId}>
                   {d.firstName} {d.lastName}
                 </option>
               ))}
-            </select>
-          </div>
+            </Select>
+          </FormField>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Visit Date</label>
-            <input
-              name="visitDate"
-              type="date"
-              value={form.visitDate}
-              onChange={handleChange}
-              required
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            />
-          </div>
+          <FormField label="Visit Date">
+            <Input name="visitDate" type="date" value={form.visitDate} onChange={handleChange} required />
+          </FormField>
 
-          <div className="col-span-2">
-            <label className="block text-xs font-medium text-gray-600 mb-1">Diagnosis</label>
+          <FormField label="Diagnosis" className="col-span-2">
             <textarea
               name="diagnosis"
               value={form.diagnosis}
@@ -174,26 +144,11 @@ export default function AddEditVisits() {
               placeholder="Enter diagnosis..."
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none"
             />
-          </div>
+          </FormField>
 
-          <div className="col-span-2 flex gap-3 mt-2">
-            <button
-              type="button"
-              onClick={() => navigate('/visits')}
-              className="flex-1 py-2 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 py-2 text-sm rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Saving...' : isEdit ? 'Update Visit' : 'Save Visit'}
-            </button>
-          </div>
+          <FormActions onCancel={() => navigate('/visits')} submitLabel={isEdit ? 'Update Visit' : 'Save Visit'} submitting={loading} className="col-span-2" />
         </form>
-      </div>
+      </Card>
     </div>
   )
 }

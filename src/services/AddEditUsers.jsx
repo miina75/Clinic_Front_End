@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
+import { Button, Card, FormField, Input, Select, FormActions, LoadingMessage } from '../components/ui'
 
 const API = import.meta.env.VITE_CLINIC_API
 const roles = ['Admin', 'Receptionist', 'Doctor', 'Patient']
@@ -79,111 +80,45 @@ export default function AddEditUsers() {
     }
   }
 
-  if (fetching) return (
-    <div className="flex items-center justify-center py-20 text-sm text-gray-400">
-      Loading user...
-    </div>
-  )
-
-  if (error) return (
-    <div className="flex items-center justify-center py-20 text-sm text-red-400">
-      {error}
-    </div>
-  )
+  if (fetching) return <LoadingMessage message="Loading user..." />
+  if (error) return <div className="py-20 text-center text-sm text-red-400">{error}</div>
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs text-gray-400 mb-1">
-            Users &gt; {isEdit ? 'Edit User' : 'Add User'}
-          </p>
-          <h2 className="text-xl font-bold text-gray-800">
-            {isEdit ? 'Edit User' : 'Add User'}
-          </h2>
+          <p className="text-xs text-gray-400 mb-1">Users &gt; {isEdit ? 'Edit User' : 'Add User'}</p>
+          <h2 className="text-xl font-bold text-gray-800">{isEdit ? 'Edit User' : 'Add User'}</h2>
         </div>
         {isEdit && (
-          <button
-            onClick={handleDelete}
-            className="flex items-center gap-2 bg-red-50 text-red-500 text-sm px-4 py-2 rounded-lg hover:bg-red-100 transition-colors"
-          >
-            Delete User
-          </button>
+          <Button variant="danger" size="sm" onClick={handleDelete}>Delete User</Button>
         )}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-6 max-w-lg">
+      <Card className="w-full max-w-2xl">
         <form onSubmit={handleSave} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Username</label>
-            <input
-              name="username"
-              type="text"
-              value={form.username}
-              onChange={handleChange}
-              required
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            />
-          </div>
+          <FormField label="Username">
+            <Input name="username" type="text" value={form.username} onChange={handleChange} required />
+          </FormField>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Email</label>
-            <input
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            />
-          </div>
+          <FormField label="Email">
+            <Input name="email" type="email" value={form.email} onChange={handleChange} required />
+          </FormField>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              {isEdit ? 'New Password (leave blank to keep current)' : 'Password'}
-            </label>
-            <input
-              name="passwordHash"
-              type="password"
-              value={form.passwordHash}
-              onChange={handleChange}
-              required={!isEdit}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            />
-          </div>
+          <FormField label={isEdit ? 'New Password (leave blank to keep current)' : 'Password'}>
+            <Input name="passwordHash" type="password" value={form.passwordHash} onChange={handleChange} required={!isEdit} />
+          </FormField>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Role</label>
-            <select
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-              required
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            >
+          <FormField label="Role">
+            <Select name="role" value={form.role} onChange={handleChange} required>
               <option value="">Select role</option>
               {roles.map(r => <option key={r}>{r}</option>)}
-            </select>
-          </div>
+            </Select>
+          </FormField>
 
-          <div className="flex gap-3 mt-2">
-            <button
-              type="button"
-              onClick={() => navigate('/users')}
-              className="flex-1 py-2 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 py-2 text-sm rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Saving...' : isEdit ? 'Update User' : 'Save User'}
-            </button>
-          </div>
+          <FormActions onCancel={() => navigate('/users')} submitLabel={isEdit ? 'Update User' : 'Save User'} submitting={loading} />
         </form>
-      </div>
+      </Card>
     </div>
   )
 }

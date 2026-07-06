@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { Button, Card, LoadingMessage, Table } from '../components/ui'
 import { IconPlus, IconEdit, IconTrash } from '@tabler/icons-react'
+import { SearchBar } from '../components/ui'
 
 const API = import.meta.env.VITE_CLINIC_API
 
@@ -13,6 +15,7 @@ const statusColors = {
 
 export default function Bills() {
   const [bills, setBills] = useState([])
+  const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const navigate = useNavigate()
@@ -43,76 +46,71 @@ export default function Bills() {
     }
   }
 
+  const columns = [
+    { key: 'billId', label: 'Bill ID' },
+    { key: 'visitId', label: 'Visit ID' },
+    { key: 'amount', label: 'Amount' },
+    { key: 'paymentStatus', label: 'Payment Status' },
+    { key: 'billDate', label: 'Bill Date' },
+    { key: 'actions', label: 'Action' },
+  ]
+
+  const filteredBills = bills.filter((bill) => {
+    const term = search.toLowerCase()
+    return bill.paymentStatus.toLowerCase().includes(term)
+  })
+
+  const renderRow = (bill) => (
+    <tr key={bill.billId} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+      <td className="py-3 text-gray-400 dark:text-gray-500">{bill.billId}</td>
+      <td className="py-3 text-gray-700 dark:text-gray-200 font-medium">{bill.visitId}</td>
+      <td className="py-3 text-gray-700 dark:text-gray-200 font-semibold">${bill.amount}</td>
+      <td className="py-3"><span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[bill.paymentStatus] ?? 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'}`}>{bill.paymentStatus}</span></td>
+      <td className="py-3 text-gray-600 dark:text-gray-300">{bill.billDate?.split('T')[0]}</td>
+      <td className="py-3">
+        <div className="flex items-center gap-2">
+          <Button type="button" variant="secondary" size="sm" className="px-2 py-2" onClick={() => navigate(`/bills/edit/${bill.billId}`)}>
+            <IconEdit size={14} />
+          </Button>
+          <Button type="button" variant="ghost" size="sm" className="px-2 py-2 text-red-600 hover:bg-red-50" onClick={() => handleDelete(bill.billId)}>
+            <IconTrash size={14} />
+          </Button>
+        </div>
+      </td>
+    </tr>
+  )
+
   return (
     <div>
       <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">Bills</h2>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={() => navigate('/bills/add')}
-            className="flex items-center gap-2 bg-blue-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-          >
+      <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4">
+          <SearchBar
+            value={search}
+            onChange={setSearch}
+            placeholder="Search by payment status"
+            className="md:max-w-sm"
+          />
+          <Button type="button" className="flex items-center gap-2" onClick={() => navigate('/bills/add')}>
             <IconPlus size={16} /> Add Bill
-          </button>
+          </Button>
         </div>
 
         {loading ? (
-          <div className="py-12 text-center text-sm text-gray-400">Loading bills...</div>
+          <LoadingMessage message="Loading bills..." />
         ) : error ? (
           <div className="py-12 text-center text-sm text-red-400">{error}</div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 dark:border-gray-700 text-left text-xs text-gray-400 uppercase">
-                <th className="pb-3 font-medium">Bill Id</th>
-                <th className="pb-3 font-medium">Visit ID</th>
-                <th className="pb-3 font-medium">Amount</th>
-                <th className="pb-3 font-medium">Payment Status</th>
-                <th className="pb-3 font-medium">Bill Date</th>
-                <th className="pb-3 font-medium">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bills.map((bill) => (
-                <tr key={bill.billId} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <td className="py-3 text-gray-400 dark:text-gray-500">{bill.billId}</td>
-                  <td className="py-3 text-gray-700 dark:text-gray-200 font-medium">{bill.visitId}</td>
-                  <td className="py-3 text-gray-700 dark:text-gray-200 font-semibold">${bill.amount}</td>
-                  <td className="py-3">
-                    <span className={`rounded-full px-3 py-1 text-xs font-medium ${statusColors[bill.paymentStatus] ?? 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'}`}>
-                      {bill.paymentStatus}
-                    </span>
-                  </td>
-                  <td className="py-3 text-gray-600 dark:text-gray-300">{bill.billDate?.split('T')[0]}</td>
-                  <td className="py-3">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => navigate(`/bills/edit/${bill.billId}`)}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
-                      >
-                        <IconEdit size={14} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(bill.billId)}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50 dark:bg-red-900/30 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
-                      >
-                        <IconTrash size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table columns={columns} data={filteredBills} renderRow={renderRow} className="min-w-full" />
         )}
 
         {!loading && !error && (
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
-            Showing 1 to {bills.length} of {bills.length} entries
+            Showing 1 to {filteredBills.length} of {filteredBills.length} entries
           </p>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

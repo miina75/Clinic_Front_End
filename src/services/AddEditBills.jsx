@@ -1,7 +1,7 @@
-
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
+import { Button, Card, FormField, Input, Select, FormActions, LoadingMessage } from '../components/ui'
 
 const API = import.meta.env.VITE_CLINIC_API
 const statuses = ['Paid', 'Pending', 'Cancelled']
@@ -21,7 +21,7 @@ export default function AddEditBills() {
   useEffect(() => {
     fetchVisits()
     if (isEdit) fetchBill()
-  }, [id])
+  }, [id, isEdit])
 
   async function fetchVisits() {
     try {
@@ -85,7 +85,7 @@ export default function AddEditBills() {
     }
   }
 
-  if (fetching) return <div className="py-20 text-center text-sm text-gray-400">Loading bill...</div>
+  if (fetching) return <LoadingMessage message="Loading bill..." />
   if (error) return <div className="py-20 text-center text-sm text-red-400">{error}</div>
 
   return (
@@ -96,92 +96,43 @@ export default function AddEditBills() {
           <h2 className="text-xl font-bold text-gray-800">{isEdit ? 'Edit Bill' : 'Add Bill'}</h2>
         </div>
         {isEdit && (
-          <button
-            onClick={handleDelete}
-            className="bg-red-50 text-red-500 text-sm px-4 py-2 rounded-lg hover:bg-red-100 transition-colors"
-          >
+          <Button variant="danger" size="sm" onClick={handleDelete}>
             Delete Bill
-          </button>
+          </Button>
         )}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-6 max-w-lg">
+      <Card className="max-w-lg">
         <form onSubmit={handleSave} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Visit</label>
-            <select
-              name="visitId"
-              value={form.visitId}
-              onChange={handleChange}
-              required
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            >
+          <FormField label="Visit">
+            <Select name="visitId" value={form.visitId} onChange={handleChange} required>
               <option value="">Select visit</option>
               {visits.map(v => (
                 <option key={v.visitId} value={v.visitId}>
                   Visit #{v.visitId} — {v.diagnosis}
                 </option>
               ))}
-            </select>
-          </div>
+            </Select>
+          </FormField>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Amount ($)</label>
-            <input
-              name="amount"
-              type="number"
-              value={form.amount}
-              onChange={handleChange}
-              required
-              placeholder="Enter amount"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            />
-          </div>
+          <FormField label="Amount ($)">
+            <Input name="amount" type="number" value={form.amount} onChange={handleChange} required placeholder="Enter amount" />
+          </FormField>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Payment Status</label>
-            <select
-              name="paymentStatus"
-              value={form.paymentStatus}
-              onChange={handleChange}
-              required
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            >
+          <FormField label="Payment Status">
+            <Select name="paymentStatus" value={form.paymentStatus} onChange={handleChange} required>
               <option value="">Select status</option>
               {statuses.map(s => <option key={s}>{s}</option>)}
-            </select>
-          </div>
+            </Select>
+          </FormField>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Bill Date</label>
-            <input
-              name="billDate"
-              type="date"
-              value={form.billDate}
-              onChange={handleChange}
-              required
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            />
-          </div>
+          <FormField label="Bill Date">
+            <Input name="billDate" type="date" value={form.billDate} onChange={handleChange} required />
+          </FormField>
 
-          <div className="flex gap-3 mt-2">
-            <button
-              type="button"
-              onClick={() => navigate('/bills')}
-              className="flex-1 py-2 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 py-2 text-sm rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Saving...' : isEdit ? 'Update Bill' : 'Save Bill'}
-            </button>
-          </div>
+          <FormActions onCancel={() => navigate('/bills')} submitLabel={isEdit ? 'Update Bill' : 'Save Bill'} submitting={loading} />
         </form>
-      </div>
+      </Card>
     </div>
   )
 }

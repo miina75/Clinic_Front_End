@@ -1,7 +1,7 @@
-
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
+import { Button, Card, FormField, Input, Select, FormActions, LoadingMessage } from '../components/ui'
 
 const API = import.meta.env.VITE_CLINIC_API
 const empty = { visitId: '', medicationName: '', dosage: '', instructions: '' }
@@ -20,7 +20,7 @@ export default function AddEditPrescriptions() {
   useEffect(() => {
     fetchVisits()
     if (isEdit) fetchPrescription()
-  }, [id])
+  }, [id, isEdit])
 
   async function fetchVisits() {
     try {
@@ -84,7 +84,7 @@ export default function AddEditPrescriptions() {
     }
   }
 
-  if (fetching) return <div className="py-20 text-center text-sm text-gray-400">Loading prescription...</div>
+  if (fetching) return <LoadingMessage message="Loading prescription..." />
   if (error) return <div className="py-20 text-center text-sm text-red-400">{error}</div>
 
   return (
@@ -95,63 +95,34 @@ export default function AddEditPrescriptions() {
           <h2 className="text-xl font-bold text-gray-800">{isEdit ? 'Edit Prescription' : 'Add Prescription'}</h2>
         </div>
         {isEdit && (
-          <button
-            onClick={handleDelete}
-            className="bg-red-50 text-red-500 text-sm px-4 py-2 rounded-lg hover:bg-red-100 transition-colors"
-          >
+          <Button variant="danger" size="sm" onClick={handleDelete}>
             Delete Prescription
-          </button>
+          </Button>
         )}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-6 max-w-lg">
+      <Card className="max-w-lg">
         <form onSubmit={handleSave} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Visit</label>
-            <select
-              name="visitId"
-              value={form.visitId}
-              onChange={handleChange}
-              required
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            >
+          <FormField label="Visit">
+            <Select name="visitId" value={form.visitId} onChange={handleChange} required>
               <option value="">Select visit</option>
               {visits.map(v => (
                 <option key={v.visitId} value={v.visitId}>
                   Visit #{v.visitId} — {v.diagnosis}
                 </option>
               ))}
-            </select>
-          </div>
+            </Select>
+          </FormField>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Medication Name</label>
-            <input
-              name="medicationName"
-              type="text"
-              value={form.medicationName}
-              onChange={handleChange}
-              required
-              placeholder="Enter medication name"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            />
-          </div>
+          <FormField label="Medication Name">
+            <Input name="medicationName" type="text" value={form.medicationName} onChange={handleChange} required placeholder="Enter medication name" />
+          </FormField>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Dosage</label>
-            <input
-              name="dosage"
-              type="text"
-              value={form.dosage}
-              onChange={handleChange}
-              required
-              placeholder="e.g. 5mg"
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            />
-          </div>
+          <FormField label="Dosage">
+            <Input name="dosage" type="text" value={form.dosage} onChange={handleChange} required placeholder="e.g. 5mg" />
+          </FormField>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Instructions</label>
+          <FormField label="Instructions">
             <textarea
               name="instructions"
               value={form.instructions}
@@ -161,26 +132,11 @@ export default function AddEditPrescriptions() {
               placeholder="Enter instructions..."
               className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none"
             />
-          </div>
+          </FormField>
 
-          <div className="flex gap-3 mt-2">
-            <button
-              type="button"
-              onClick={() => navigate('/prescriptions')}
-              className="flex-1 py-2 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 py-2 text-sm rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Saving...' : isEdit ? 'Update Prescription' : 'Save Prescription'}
-            </button>
-          </div>
+          <FormActions onCancel={() => navigate('/prescriptions')} submitLabel={isEdit ? 'Update Prescription' : 'Save Prescription'} submitting={loading} />
         </form>
-      </div>
+      </Card>
     </div>
   )
 }

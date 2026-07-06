@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { Button, Card, LoadingMessage, Table } from '../components/ui'
 import { IconPlus, IconEdit, IconTrash } from '@tabler/icons-react'
+import { SearchBar } from '../components/ui'
 
 const API = import.meta.env.VITE_CLINIC_API
 
 export default function Visits() {
   const [visits, setVisits] = useState([])
+  const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const navigate = useNavigate()
@@ -37,72 +40,71 @@ export default function Visits() {
     }
   }
 
+  const columns = [
+    { key: 'visitId', label: 'Visit ID' },
+    { key: 'patientId', label: 'Patient ID' },
+    { key: 'doctorId', label: 'Doctor ID' },
+    { key: 'visitDate', label: 'Visit Date' },
+    { key: 'diagnosis', label: 'Diagnosis' },
+    { key: 'actions', label: 'Action' },
+  ]
+
+  const filteredVisits = visits.filter((visit) => {
+    const term = search.toLowerCase()
+    return visit.diagnosis.toLowerCase().includes(term)
+  })
+
+  const renderRow = (visit) => (
+    <tr key={visit.visitId} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+      <td className="py-3 text-gray-400 dark:text-gray-500">{visit.visitId}</td>
+      <td className="py-3 text-gray-700 dark:text-gray-200 font-medium">{visit.patientId}</td>
+      <td className="py-3 text-gray-600 dark:text-gray-300">{visit.doctorId}</td>
+      <td className="py-3 text-gray-600 dark:text-gray-300">{visit.visitDate?.split('T')[0]}</td>
+      <td className="py-3 text-gray-600 dark:text-gray-300">{visit.diagnosis}</td>
+      <td className="py-3">
+        <div className="flex items-center gap-2">
+          <Button type="button" variant="secondary" size="sm" className="px-2 py-2" onClick={() => navigate(`/visits/edit/${visit.visitId}`)}>
+            <IconEdit size={14} />
+          </Button>
+          <Button type="button" variant="ghost" size="sm" className="px-2 py-2 text-red-600 hover:bg-red-50" onClick={() => handleDelete(visit.visitId)}>
+            <IconTrash size={14} />
+          </Button>
+        </div>
+      </td>
+    </tr>
+  )
+
   return (
     <div>
       <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">Visits</h2>
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
-        <div className="flex justify-end mb-4">
-          <button
-            onClick={() => navigate('/visits/add')}
-            className="flex items-center gap-2 bg-blue-500 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-          >
+      <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4">
+          <SearchBar
+            value={search}
+            onChange={setSearch}
+            placeholder="Search by diagnosis"
+            className="md:max-w-sm"
+          />
+          <Button type="button" className="flex items-center gap-2" onClick={() => navigate('/visits/add')}>
             <IconPlus size={16} /> New Visit
-          </button>
+          </Button>
         </div>
 
         {loading ? (
-          <div className="py-12 text-center text-sm text-gray-400">Loading visits...</div>
+          <LoadingMessage message="Loading visits..." />
         ) : error ? (
           <div className="py-12 text-center text-sm text-red-400">{error}</div>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-100 dark:border-gray-700 text-left text-xs text-gray-400 uppercase">
-                <th className="pb-3 font-medium">Visit ID</th>
-                <th className="pb-3 font-medium">Patient ID</th>
-                <th className="pb-3 font-medium">Doctor ID</th>
-                <th className="pb-3 font-medium">Visit Date</th>
-                <th className="pb-3 font-medium">Diagnosis</th>
-                <th className="pb-3 font-medium">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {visits.map((visit, i) => (
-                <tr key={visit.visitId} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <td className="py-3 text-gray-400 dark:text-gray-500">{i + 1}</td>
-                  <td className="py-3 text-gray-700 dark:text-gray-200 font-medium">{visit.patientId}</td>
-                  <td className="py-3 text-gray-600 dark:text-gray-300">{visit.doctorId}</td>
-                  <td className="py-3 text-gray-600 dark:text-gray-300">{visit.visitDate?.split('T')[0]}</td>
-                  <td className="py-3 text-gray-600 dark:text-gray-300">{visit.diagnosis}</td>
-                  <td className="py-3">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => navigate(`/visits/edit/${visit.visitId}`)}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
-                      >
-                        <IconEdit size={14} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(visit.visitId)}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50 dark:bg-red-900/30 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
-                      >
-                        <IconTrash size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table columns={columns} data={filteredVisits} renderRow={renderRow} className="min-w-full" />
         )}
 
         {!loading && !error && (
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
-            Showing 1 to {visits.length} of {visits.length} entries
+            Showing 1 to {filteredVisits.length} of {filteredVisits.length} entries
           </p>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
+import { Button, Card, FormField, Input, FormActions, LoadingMessage } from '../components/ui'
 
 const API = import.meta.env.VITE_CLINIC_API
 const empty = { firstName: '', lastName: '', userId: '', specialty: '', phone: '', email: '' }
@@ -17,6 +18,7 @@ export default function AddEditDoctors() {
 
   useEffect(() => {
     if (!isEdit) return
+
     async function fetchDoctor() {
       try {
         setFetching(true)
@@ -40,8 +42,9 @@ export default function AddEditDoctors() {
         setFetching(false)
       }
     }
+
     fetchDoctor()
-  }, [id])
+  }, [id, isEdit])
 
   function handleChange(e) {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }))
@@ -74,67 +77,41 @@ export default function AddEditDoctors() {
     }
   }
 
-  if (fetching) return <div className="py-20 text-center text-sm text-gray-400">Loading doctor...</div>
+  if (fetching) return <LoadingMessage message="Loading doctor..." />
   if (error) return <div className="py-20 text-center text-sm text-red-400">{error}</div>
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-xs text-gray-400 mb-1">Doctors &gt; {isEdit ? 'Edit Doctor' : 'Add Doctor'}</p>
           <h2 className="text-xl font-bold text-gray-800">{isEdit ? 'Edit Doctor' : 'Add Doctor'}</h2>
         </div>
         {isEdit && (
-          <button
-            onClick={handleDelete}
-            className="bg-red-50 text-red-500 text-sm px-4 py-2 rounded-lg hover:bg-red-100 transition-colors"
-          >
+          <Button variant="danger" size="sm" onClick={handleDelete}>
             Delete Doctor
-          </button>
+          </Button>
         )}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm p-6 max-w-lg">
-        <form onSubmit={handleSave} className="grid grid-cols-2 gap-4">
+      <Card className="w-full max-w-2xl">
+        <form onSubmit={handleSave} className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {[
             { label: 'First Name', key: 'firstName', type: 'text' },
             { label: 'Last Name', key: 'lastName', type: 'text' },
-            { label: 'UserId', key: 'userId', type: 'text' },
+            { label: 'User ID', key: 'userId', type: 'text' },
             { label: 'Specialty', key: 'specialty', type: 'text' },
             { label: 'Phone', key: 'phone', type: 'text' },
             { label: 'Email', key: 'email', type: 'email' },
           ].map(({ label, key, type }) => (
-            <div key={key} className={key === 'email' ? 'col-span-2' : ''}>
-              <label className="block text-xs font-medium text-gray-600 mb-1">{label}</label>
-              <input
-                name={key}
-                type={type}
-                value={form[key]}
-                onChange={handleChange}
-                required
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-              />
-            </div>
+            <FormField key={key} label={label} className={key === 'email' ? 'col-span-2' : ''}>
+              <Input name={key} type={type} value={form[key]} onChange={handleChange} required />
+            </FormField>
           ))}
 
-          <div className="col-span-2 flex gap-3 mt-2">
-            <button
-              type="button"
-              onClick={() => navigate('/doctors')}
-              className="flex-1 py-2 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 py-2 text-sm rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Saving...' : isEdit ? 'Update Doctor' : 'Save Doctor'}
-            </button>
-          </div>
+          <FormActions onCancel={() => navigate('/doctors')} submitLabel={isEdit ? 'Update Doctor' : 'Save Doctor'} submitting={loading} className="col-span-2" />
         </form>
-      </div>
+      </Card>
     </div>
   )
 }
