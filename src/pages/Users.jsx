@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { IconPlus, IconEdit, IconTrash } from '@tabler/icons-react'
+
 const API = import.meta.env.VITE_CLINIC_API
+
 const roleColors = {
-  Admin: 'bg-purple-100 text-purple-700',
-  Receptionist: 'bg-blue-100 text-blue-700',
-  Doctor: 'bg-green-100 text-green-700',
-  Patient: 'bg-gray-100 text-gray-600',
+  Admin: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-400',
+  Receptionist: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
+  Doctor: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
+  Patient: 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300',
 }
 
 export default function Users() {
@@ -19,18 +21,17 @@ export default function Users() {
   useEffect(() => { fetchUsers() }, [])
 
   async function fetchUsers() {
-  try {
-    setLoading(true)
-    const res = await axios.get(`${API}/Users`)
-    console.log(res.data)
-    if (res.data.status) setUsers(res.data.data)
-    else setError(res.data.message)
-  } catch (err) {
-    setError('Failed to connect to API')
-  } finally {
-    setLoading(false)
+    try {
+      setLoading(true)
+      const res = await axios.get(`${API}/Users`)
+      if (res.data.status) setUsers(res.data.data)
+      else setError(res.data.message)
+    } catch (err) {
+      setError('Failed to connect to API')
+    } finally {
+      setLoading(false)
+    }
   }
-}
 
   async function handleDelete(userId, username) {
     if (!confirm(`Delete user "${username}"?`)) return
@@ -45,9 +46,9 @@ export default function Users() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-800 mb-6">Users</h2>
+      <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">Users</h2>
 
-      <div className="bg-white rounded-xl shadow-sm p-5">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
         <div className="flex justify-end mb-4">
           <button
             onClick={() => navigate('/users/add')}
@@ -64,8 +65,8 @@ export default function Users() {
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100 text-left text-xs text-gray-400 uppercase">
-                <th className="pb-3 font-medium">UserId</th>
+              <tr className="border-b border-gray-100 dark:border-gray-700 text-left text-xs text-gray-400 uppercase">
+                <th className="pb-3 font-medium">User Id</th>
                 <th className="pb-3 font-medium">Username</th>
                 <th className="pb-3 font-medium">Email</th>
                 <th className="pb-3 font-medium">Role</th>
@@ -73,13 +74,13 @@ export default function Users() {
               </tr>
             </thead>
             <tbody>
-              {users.map((user, i) => (
-                <tr key={user.userId} className="border-b border-gray-50 last:border-0 hover:bg-gray-50">
-                  <td className="py-3 text-gray-400">{user.userId}</td>
-                  <td className="py-3 text-gray-700 font-medium">{user.username}</td>
-                  <td className="py-3 text-gray-600">{user.email}</td>
+              {users.map((user) => (
+                <tr key={user.userId} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                  <td className="py-3 text-gray-400 dark:text-gray-500">{user.userId}</td>
+                  <td className="py-3 text-gray-700 dark:text-gray-200 font-medium">{user.username}</td>
+                  <td className="py-3 text-gray-600 dark:text-gray-300">{user.email}</td>
                   <td className="py-3">
-                    <span className={`rounded-full px-3 py-1 text-xs font-medium ${roleColors[user.role] ?? 'bg-gray-100 text-gray-600'}`}>
+                    <span className={`rounded-full px-3 py-1 text-xs font-medium ${roleColors[user.role] ?? 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'}`}>
                       {user.role}
                     </span>
                   </td>
@@ -87,13 +88,13 @@ export default function Users() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => navigate(`/users/edit/${user.userId}`)}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 transition-colors"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
                       >
                         <IconEdit size={14} />
                       </button>
                       <button
                         onClick={() => handleDelete(user.userId, user.username)}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50 dark:bg-red-900/30 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
                       >
                         <IconTrash size={14} />
                       </button>
@@ -106,7 +107,7 @@ export default function Users() {
         )}
 
         {!loading && !error && (
-          <p className="text-xs text-gray-400 mt-3">
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
             Showing 1 to {users.length} of {users.length} entries
           </p>
         )}

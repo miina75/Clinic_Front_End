@@ -134,18 +134,6 @@ export default function AddEditPatients() {
             </select>
           </div>
 
-          <div className="col-span-2">
-            <label className="block text-xs font-medium text-gray-600 mb-1">Address</label>
-            <input
-              name="address"
-              type="text"
-              value={form.address}
-              onChange={handleChange}
-              required
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-100"
-            />
-          </div>
-
           <div className="col-span-2 flex gap-3 mt-2">
             <button
               type="button"

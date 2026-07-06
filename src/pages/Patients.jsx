@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
@@ -40,9 +39,9 @@ export default function Patients() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-800 mb-6">Patients</h2>
+      <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">Patients</h2>
 
-      <div className="bg-white rounded-xl shadow-sm p-5">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
         <div className="flex justify-end mb-4">
           <button
             onClick={() => navigate('/patients/add')}
@@ -59,9 +58,9 @@ export default function Patients() {
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-100 text-left text-xs text-gray-400 uppercase">
-                <th className="pb-3 font-medium">PatientId</th>
-                  <th className="pb-3 font-medium">UserId</th>
+              <tr className="border-b border-gray-100 dark:border-gray-700 text-left text-xs text-gray-400 uppercase">
+                <th className="pb-3 font-medium">Patient Id</th>
+                <th className="pb-3 font-medium">User Id</th>
                 <th className="pb-3 font-medium">Name</th>
                 <th className="pb-3 font-medium">Gender</th>
                 <th className="pb-3 font-medium">Date of Birth</th>
@@ -71,37 +70,36 @@ export default function Patients() {
               </tr>
             </thead>
             <tbody>
-              {patients.map((patient, i) => (
-                <tr key={patient.patientId} className="border-b border-gray-50 last:border-0 hover:bg-gray-50">
-                  <td className="py-3 text-gray-400">{patient.patientId}</td>
-                    <td className="py-3 text-gray-600">{patient.userId}</td>
-                  <td className="py-3 text-gray-700 font-medium">
-                    
+              {patients.map((patient) => (
+                <tr key={patient.patientId} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                  <td className="py-3 text-gray-400 dark:text-gray-500">{patient.patientId}</td>
+                  <td className="py-3 text-gray-600 dark:text-gray-400">{patient.userId}</td>
+                  <td className="py-3 text-gray-700 dark:text-gray-200 font-medium">
                     {patient.firstName} {patient.lastName}
                   </td>
                   <td className="py-3">
                     <span className={`rounded-full px-3 py-1 text-xs font-medium ${
                       patient.gender === 'Male'
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'bg-pink-50 text-pink-600'
+                        ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                        : 'bg-pink-50 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400'
                     }`}>
                       {patient.gender}
                     </span>
                   </td>
-                  <td className="py-3 text-gray-600">{patient.dateOfBirth?.split('T')[0]}</td>
-                  <td className="py-3 text-gray-600">{patient.phone}</td>
-                  <td className="py-3 text-gray-600">{patient.address}</td>
+                  <td className="py-3 text-gray-600 dark:text-gray-300">{patient.dateOfBirth?.split('T')[0]}</td>
+                  <td className="py-3 text-gray-600 dark:text-gray-300">{patient.phone}</td>
+                  <td className="py-3 text-gray-600 dark:text-gray-300">{patient.address}</td>
                   <td className="py-3">
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => navigate(`/patients/edit/${patient.patientId}`)}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 transition-colors"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
                       >
                         <IconEdit size={14} />
                       </button>
                       <button
                         onClick={() => handleDelete(patient.patientId, `${patient.firstName} ${patient.lastName}`)}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50 dark:bg-red-900/30 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
                       >
                         <IconTrash size={14} />
                       </button>
@@ -114,7 +112,7 @@ export default function Patients() {
         )}
 
         {!loading && !error && (
-          <p className="text-xs text-gray-400 mt-3">
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-3">
             Showing 1 to {patients.length} of {patients.length} entries
           </p>
         )}
