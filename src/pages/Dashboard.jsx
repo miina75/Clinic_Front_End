@@ -118,7 +118,7 @@ export default function Dashboard() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 dark:border-gray-700 text-left text-xs text-gray-400 uppercase">
-                <th className="pb-3 font-medium">#</th>
+                <th className="pb-3 font-medium">Visit Id</th>
                 <th className="pb-3 font-medium">Patient</th>
                 <th className="pb-3 font-medium">Doctor</th>
                 <th className="pb-3 font-medium">Date</th>
@@ -129,7 +129,7 @@ export default function Dashboard() {
             <tbody>
               {recentVisits.map((visit, i) => (
                 <tr key={visit.visitId} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <td className="py-3 text-gray-400">{i + 1}</td>
+                  <td className="py-3 text-gray-400">{visit.visitId}</td>
                   <td className="py-3 text-gray-700 dark:text-gray-200 font-medium">
                     {patients[visit.patientId] ?? `Patient #${visit.patientId}`}
                   </td>
