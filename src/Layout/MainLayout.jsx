@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { IconBell, IconMenu2 } from '@tabler/icons-react'
-import Sidebar from '../layout/Sidebar'
+import Sidebar from '../Layout/Sidebar'
 import { useAuth } from '../context/AuthContext'
 
 export default function MainLayout() {
