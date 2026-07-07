@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
-import { Button, Card, FormField, Input, FormActions, LoadingMessage } from '../components/ui'
+import { Button, Card, FormField, Input, Select, FormActions, LoadingMessage } from '../components/ui'
 
 const API = import.meta.env.VITE_CLINIC_API
 const empty = { firstName: '', lastName: '', userId: '', specialty: '', phone: '', email: '' }
@@ -15,6 +15,20 @@ export default function AddEditDoctors() {
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(isEdit)
   const [error, setError] = useState(null)
+  const [users, setUsers] = useState([])
+
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const res = await axios.get(`${API}/Users`)
+        if (res.data.status) setUsers(res.data.data || [])
+      } catch {
+        setUsers([])
+      }
+    }
+
+    fetchUsers()
+  }, [])
 
   useEffect(() => {
     if (!isEdit) return
@@ -96,10 +110,20 @@ export default function AddEditDoctors() {
 
       <Card className="w-full max-w-2xl">
         <form onSubmit={handleSave} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormField label="User ID">
+            <Select name="userId" value={form.userId} onChange={handleChange} required>
+              <option value="">Select user ID</option>
+              {users.map(user => (
+                <option key={user.userId} value={user.userId}>
+                  {user.userId}{user.username ? ` - ${user.username}` : ''}
+                </option>
+              ))}
+            </Select>
+          </FormField>
+
           {[
             { label: 'First Name', key: 'firstName', type: 'text' },
             { label: 'Last Name', key: 'lastName', type: 'text' },
-            { label: 'User ID', key: 'userId', type: 'text' },
             { label: 'Specialty', key: 'specialty', type: 'text' },
             { label: 'Phone', key: 'phone', type: 'text' },
             { label: 'Email', key: 'email', type: 'email' },

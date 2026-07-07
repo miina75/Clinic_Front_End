@@ -5,7 +5,7 @@ import { Button, Card, FormField, Input, Select, FormActions, LoadingMessage } f
 
 const API = import.meta.env.VITE_CLINIC_API
 const genders = ['Male', 'Female']
-const empty = { firstName: '', lastName: '', gender: '', dateOfBirth: '', phone: '', address: '' }
+const empty = { userId: '', firstName: '', lastName: '', gender: '', dateOfBirth: '', phone: '', address: '' }
 
 export default function AddEditPatients() {
   const { id } = useParams()
@@ -16,6 +16,20 @@ export default function AddEditPatients() {
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(isEdit)
   const [error, setError] = useState(null)
+  const [users, setUsers] = useState([])
+
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const res = await axios.get(`${API}/Users`)
+        if (res.data.status) setUsers(res.data.data || [])
+      } catch {
+        setUsers([])
+      }
+    }
+
+    fetchUsers()
+  }, [])
 
   useEffect(() => {
     if (!isEdit) return
@@ -98,8 +112,18 @@ export default function AddEditPatients() {
 
       <Card className="w-full max-w-2xl">
         <form onSubmit={handleSave} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormField label="User ID">
+            <Select name="userId" value={form.userId} onChange={handleChange} required>
+              <option value="">Select user ID</option>
+              {users.map(user => (
+                <option key={user.userId} value={user.userId}>
+                  {user.userId}{user.username ? ` - ${user.username}` : ''}
+                </option>
+              ))}
+            </Select>
+          </FormField>
+
           {[
-            { label: 'User ID', key: 'userId', type: 'text' },
             { label: 'First Name', key: 'firstName', type: 'text' },
             { label: 'Last Name', key: 'lastName', type: 'text' },
             { label: 'Date of Birth', key: 'dateOfBirth', type: 'date' },
