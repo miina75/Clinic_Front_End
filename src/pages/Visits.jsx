@@ -42,8 +42,8 @@ export default function Visits() {
 
   const columns = [
     { key: 'visitId', label: 'Visit ID' },
-    { key: 'patientId', label: 'Patient ID' },
-    { key: 'doctorId', label: 'Doctor ID' },
+    { key: 'patientName', label: 'Patient Name' },
+    { key: 'doctorName', label: 'Doctor Name' },
     { key: 'visitDate', label: 'Visit Date' },
     { key: 'diagnosis', label: 'Diagnosis' },
     { key: 'actions', label: 'Action' },
@@ -51,14 +51,14 @@ export default function Visits() {
 
   const filteredVisits = visits.filter((visit) => {
     const term = search.toLowerCase()
-    return visit.diagnosis.toLowerCase().includes(term)
+    return (visit.diagnosis || '').toLowerCase().includes(term)
   })
 
   const renderRow = (visit) => (
     <tr key={visit.visitId} className="border-b border-gray-50 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700/50">
       <td className="py-3 text-gray-400 dark:text-gray-500">{visit.visitId}</td>
-      <td className="py-3 text-gray-700 dark:text-gray-200 font-medium">{visit.patientId}</td>
-      <td className="py-3 text-gray-600 dark:text-gray-300">{visit.doctorId}</td>
+      <td className="py-3 text-gray-700 dark:text-gray-200 font-medium">{visit.patientName}</td>
+      <td className="py-3 text-gray-600 dark:text-gray-300">{visit.doctorName}</td>
       <td className="py-3 text-gray-600 dark:text-gray-300">{visit.visitDate?.split('T')[0]}</td>
       <td className="py-3 text-gray-600 dark:text-gray-300">{visit.diagnosis}</td>
       <td className="py-3">
