@@ -6,7 +6,7 @@ import { IconPlus, IconEdit, IconTrash } from '@tabler/icons-react'
 import { SearchBar } from '../components/ui'
 
 const API = import.meta.env.VITE_CLINIC_API
-
+// testing
 export default function Users() {
   const [users, setUsers] = useState([])
   const [search, setSearch] = useState('')
